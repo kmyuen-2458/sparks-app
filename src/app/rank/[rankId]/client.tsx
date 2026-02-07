@@ -15,6 +15,8 @@ export default function UnitListClient({ rankId }: { rankId: string }) {
     }
 
     const rank = data?.ranks.find(r => r.id === rankId);
+    console.log('Target Rank:', rankId);
+    console.log('Available Ranks:', data?.ranks.map(r => r.id));
 
     if (!rank) {
         return (
