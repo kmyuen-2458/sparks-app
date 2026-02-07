@@ -7,7 +7,7 @@ import clsx from 'clsx';
 import { useRouter } from 'next/navigation';
 
 export default function UnitListClient({ rankId }: { rankId: string }) {
-    const { data, loading } = useAudioData();
+    const { data, loading, error } = useAudioData();
     const router = useRouter();
 
     if (loading) {
@@ -22,6 +22,13 @@ export default function UnitListClient({ rankId }: { rankId: string }) {
         return (
             <div className="min-h-screen p-8 text-center">
                 <h1 className="text-2xl font-bold mb-4">Rank Not Found</h1>
+                <div className="bg-slate-100 p-4 rounded text-left text-xs font-mono mb-4 overflow-auto max-h-64">
+                    <p><strong>Target:</strong> {rankId}</p>
+                    <p><strong>Loaded Ranks:</strong> {data?.ranks?.length || 0}</p>
+                    <p><strong>IDs:</strong> {data?.ranks?.map(r => r.id).join(', ') || 'None'}</p>
+                    <p><strong>Loading:</strong> {loading ? 'Yes' : 'No'}</p>
+                    <p><strong>Error:</strong> {JSON.stringify(error)}</p>
+                </div>
                 <Link href="/" className="text-blue-600 underline">Go Home</Link>
             </div>
         );
