@@ -93,10 +93,6 @@ export default function UnitListClient({ rankId }: { rankId: string }) {
                         </div>
                     )}
                 </div>
-
-                <div className="mt-12 text-center text-white/50 text-sm font-mono">
-                    v1.1 - Design Update
-                </div>
             </div>
         </div>
     );
