@@ -108,7 +108,7 @@ function StageCard({ stage, rankId, index }: { stage: any; rankId: string; index
     // Default unlocked for now (since we don't have user progress tracking yet)
     // You can hook up real progress later
     const isLocked = false;
-    const progress = 0; // Placeholder
+    const progress: number = 0; // Placeholder
 
     return (
         <motion.div
