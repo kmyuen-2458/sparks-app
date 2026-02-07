@@ -1,36 +1,79 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Sparks Audio Web App
 
-## Getting Started
+A kid-friendly web app for CCAC Awana Sparks audio, built with Next.js.
+Content is managed via Google Sheets and audio is streamed directly from Google Drive.
 
-First, run the development server:
+## Features
+- **Dynamic Content**: Fetches Tracks/Sections/Units from [Google Sheet](https://docs.google.com/spreadsheets/d/1kJ1ycExJ5aOZT1NB4NoqHjBaEXVgn3naz-ESI0JJhX4/edit?usp=sharing).
+- **Audio Streaming**: Plays `drive_file_id` links directly.
+- **Progress Tracking**: Saves progress per device (localStorage). Marks tracks complete >90%.
+- **Kid-Friendly UI**: Big buttons, clear colors (HangGlider Green, WingRunner Blue, SkyStormer Red).
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+## Development
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+1. **Install Dependencies**:
+   ```bash
+   npm install
+   ```
+2. **Run Locally**:
+   ```bash
+   npm run dev
+   ```
+   Open [http://localhost:3000](http://localhost:3000) (or 3001 if 3000 is taken).
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## data Management
+The app reads from the `audio_stream` tab of the Google Sheet.
+**Columns Expected:**
+- `category` (Format: `Rank - Unit Name - Section Name`)
+- `title`
+- `drive_file_id` (The ID part of a drive link)
+- `order` (Optional, for sorting)
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Deployment (Firebase Hosting)
 
-## Learn More
+This app is configured for **Firebase Hosting** (Free Spark Plan).
 
-To learn more about Next.js, take a look at the following resources:
+### Initial Setup
+1. **Install Firebase CLI**:
+   ```bash
+   npm install -g firebase-tools
+   ```
+2. **Login**:
+   ```bash
+   firebase login
+   ```
+   (Log in with `childrenministry@ccac.church`).
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+3. **Initialize**:
+   ```bash
+   firebase init hosting
+   ```
+   - Select "Use an existing project" (or create one).
+   - Public directory: `out`
+   - Configure as single-page app? **No** (We handle rewrites in `firebase.json` manually to avoid overwriting it).
+   - Set up automatic builds? **No**.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+### Deploying Updates
+When you change code or need to redeploy:
 
-## Deploy on Vercel
+1. **Build the App**:
+   ```bash
+   npm run build
+   ```
+   (This creates the static `out/` folder).
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+2. **Deploy**:
+   ```bash
+   firebase deploy
+   ```
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+### Custom Domain
+1. Go to Firebase Console > Hosting.
+2. Click "Add Custom Domain".
+3. Enter `sparks.ccac.church`.
+4. Add the TXT records to your DNS provided by Firebase to verify ownership.
+5. Update A records as instructed.
+
+## Troubleshooting
+- **No Audio**: Check if the Drive file has "General Access" set to "Anyone with the link".
+- **Wrong Colors**: Ensure the 'category' column in the Sheet contains "HangGlider", "WingRunner", or "SkyStormer".

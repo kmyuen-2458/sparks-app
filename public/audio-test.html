@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Audio Diagnostic</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            padding: 20px;
+        }
+
+        .test-case {
+            margin-bottom: 20px;
+            padding: 15px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+        }
+
+        h3 {
+            margin-top: 0;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Audio Diagnostic Page</h1>
+    <p>Please test which of these players work.</p>
+
+    <div class="test-case">
+        <h3>Test 1: export=media (Current)</h3>
+        <p>URL: <code>export=media</code></p>
+        <audio controls src="https://drive.google.com/uc?export=media&id=1acs4IYvva18FRLq60tZmT3XVcnKrVdcF"></audio>
+    </div>
+
+    <div class="test-case">
+        <h3>Test 2: export=download</h3>
+        <p>URL: <code>export=download</code></p>
+        <audio controls src="https://drive.google.com/uc?export=download&id=1acs4IYvva18FRLq60tZmT3XVcnKrVdcF"></audio>
+    </div>
+
+    <div class="test-case">
+        <h3>Test 3: export=view</h3>
+        <p>URL: <code>export=view</code></p>
+        <audio controls src="https://drive.google.com/uc?export=view&id=1acs4IYvva18FRLq60tZmT3XVcnKrVdcF"></audio>
+    </div>
+
+    <div class="test-case">
+        <h3>Test 4: Google Drive Preview (Iframe)</h3>
+        <p>This should definitely work if the file is public.</p>
+        <iframe src="https://drive.google.com/file/d/1acs4IYvva18FRLq60tZmT3XVcnKrVdcF/preview" width="300"
+            height="150"></iframe>
+    </div>
+
+    <div class="test-case">
+        <h3>Test 5: JavaScript Fetch (Blob)</h3>
+        <p>Fetches data via JS and creates a local URL. <button onclick="runBlobTest()">Run Test</button></p>
+        <div id="blob-status">Waiting...</div>
+        <audio id="blob-player" controls></audio>
+        <script>
+            async function runBlobTest() {
+                const status = document.getElementById('blob-status');
+                const player = document.getElementById('blob-player');
+                status.textContent = "Fetching...";
+                try {
+                    const url = "https://drive.google.com/uc?export=media&id=1acs4IYvva18FRLq60tZmT3XVcnKrVdcF";
+                    const response = await fetch(url);
+                    if (!response.ok) throw new Error("Network response was not ok");
+                    const blob = await response.blob();
+                    const objectUrl = URL.createObjectURL(blob);
+                    player.src = objectUrl;
+                    status.textContent = "Success! Created Blob URL: " + objectUrl;
+                    player.play();
+                } catch (e) {
+                    status.textContent = "Error: " + e.message;
+                    console.error(e);
+                }
+            }
+        </script>
+    </div>
+
+    <div class="test-case">
+        <h3>Test 6: Direct UserContent Link</h3>
+        <p>Bypasses the main redirect.</p>
+        <audio controls
+            src="https://drive.usercontent.google.com/download?id=1acs4IYvva18FRLq60tZmT3XVcnKrVdcF&export=media"></audio>
+    </div>
+
+    <div class="test-case">
+        <h3>Test 7: Docs Domain</h3>
+        <p>Using docs.google.com instead of drive.google.com</p>
+        <audio controls src="https://docs.google.com/uc?export=media&id=1acs4IYvva18FRLq60tZmT3XVcnKrVdcF"></audio>
+    </div>
+
+</body>
+
+</html>
