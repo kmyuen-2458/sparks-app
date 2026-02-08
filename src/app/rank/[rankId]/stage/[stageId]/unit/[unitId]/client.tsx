@@ -20,11 +20,13 @@ export default function UnitPlayerClient({ rankId, stageId, unitId }: { rankId: 
     const [playbackRate, setPlaybackRate] = useState(1);
 
     // Store
-    const { tracks: savedTracks, updateProgress, markCompleted } = useProgressStore();
+    const { tracks: savedTracks, updateProgress, markCompleted, toggleUnitComplete, isUnitComplete } = useProgressStore();
 
     const rank = data?.ranks.find(r => r.id === rankId);
     const stage = rank?.stages?.find(s => s.id === stageId);
     const unit = stage?.units.find(u => u.id === unitId);
+
+    const uniqueUnitId = `${rankId}-${stageId}-${unitId}`;
 
     const tracks = unit?.tracks || [];
     const currentTrack = tracks[currentTrackIndex];
@@ -257,6 +259,29 @@ export default function UnitPlayerClient({ rankId, stageId, unitId }: { rankId: 
                     );
                 })}
 
+                {/* Mark Complete Toggle */}
+                <button
+                    onClick={() => toggleUnitComplete(uniqueUnitId)}
+                    className={clsx(
+                        "w-full flex items-center justify-center gap-3 p-4 rounded-xl font-bold text-lg border-2 transition-all mt-6",
+                        isUnitComplete(uniqueUnitId)
+                            ? `bg-green-50 border-green-200 text-green-700`
+                            : `bg-white border-slate-200 text-slate-500 hover:border-slate-300`
+                    )}
+                >
+                    {isUnitComplete(uniqueUnitId) ? (
+                        <>
+                            <CheckCircle2 size={24} className="text-green-600" />
+                            <span>Unit Completed!</span>
+                        </>
+                    ) : (
+                        <>
+                            <Circle size={24} className="text-slate-300" />
+                            <span>Mark as Complete</span>
+                        </>
+                    )}
+                </button>
+
                 {/* Next Unit Button */}
                 {(() => {
                     // Logic to find next unit
@@ -290,6 +315,11 @@ export default function UnitPlayerClient({ rankId, stageId, unitId }: { rankId: 
                         <div className="pt-4">
                             <Link
                                 href={nextUrl}
+                                onClick={() => {
+                                    if (!isUnitComplete(uniqueUnitId)) {
+                                        toggleUnitComplete(uniqueUnitId);
+                                    }
+                                }}
                                 className={clsx(
                                     "w-full flex items-center justify-between p-4 rounded-xl text-white font-bold text-lg shadow-md hover:opacity-90 active:scale-95 transition-all",
                                     theme.headerBg

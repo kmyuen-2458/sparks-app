@@ -15,12 +15,18 @@ interface ProgressState {
     updateProgress: (trackId: string, position: number, duration: number) => void;
     markCompleted: (trackId: string) => void;
     getTrackProgress: (trackId: string) => TrackProgress | undefined;
+
+    // Unit Actions
+    completedUnits: string[];
+    toggleUnitComplete: (unitId: string) => void;
+    isUnitComplete: (unitId: string) => boolean;
 }
 
 export const useProgressStore = create<ProgressState>()(
     persist(
         (set, get) => ({
             tracks: {},
+            completedUnits: [],
 
             updateProgress: (trackId, position, duration) => {
                 set((state) => {
@@ -65,7 +71,20 @@ export const useProgressStore = create<ProgressState>()(
                 });
             },
 
-            getTrackProgress: (trackId) => get().tracks[trackId]
+            getTrackProgress: (trackId) => get().tracks[trackId],
+
+            // Unit Progress
+            toggleUnitComplete: (unitId) => {
+                set((state) => {
+                    const exists = state.completedUnits.includes(unitId);
+                    if (exists) {
+                        return { ...state, completedUnits: state.completedUnits.filter((id) => id !== unitId) };
+                    } else {
+                        return { ...state, completedUnits: [...state.completedUnits, unitId] };
+                    }
+                });
+            },
+            isUnitComplete: (unitId) => get().completedUnits.includes(unitId),
         }),
         {
             name: 'ccac_sparks_progress_v1',

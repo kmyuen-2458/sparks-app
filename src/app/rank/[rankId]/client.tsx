@@ -1,6 +1,7 @@
 'use client';
 
 import { useAudioData } from '@/hooks/use-audio-data';
+import { useProgressStore } from '@/store/progress-store';
 import Link from 'next/link';
 import { Crown, Gem, Star, Lock, ArrowLeft, Book } from 'lucide-react';
 import { motion } from 'framer-motion';
@@ -10,6 +11,7 @@ import { useRouter } from 'next/navigation';
 export default function UnitListClient({ rankId }: { rankId: string }) {
     const { data, loading, error } = useAudioData();
     const router = useRouter();
+    const { completedUnits } = useProgressStore();
 
     if (loading) {
         return (
@@ -88,6 +90,7 @@ export default function UnitListClient({ rankId }: { rankId: string }) {
                                     stage={stage}
                                     rankId={rankId}
                                     index={index}
+                                    completedUnits={completedUnits}
                                 />
                             ))}
                         </div>
@@ -98,17 +101,27 @@ export default function UnitListClient({ rankId }: { rankId: string }) {
     );
 }
 
-function StageCard({ stage, rankId, index }: { stage: any; rankId: string; index: number }) {
+function StageCard({ stage, rankId, index, completedUnits }: { stage: any; rankId: string; index: number; completedUnits: string[] }) {
     // Logic to determine style based on title text
     const style = getStageStyle(stage.title);
 
     // Logic to determine icon
     const Icon = getStageIcon(stage.title);
 
-    // Default unlocked for now (since we don't have user progress tracking yet)
-    // You can hook up real progress later
+    // Progress Calculation
+    const totalUnits = stage.units.length;
+
+    // Check against composite ID: rankId-stageId-unitId
+    const completedCount = stage.units.filter((u: any) => {
+        const uniqueId = `${rankId}-${stage.id}-${u.id}`;
+        return completedUnits.includes(uniqueId);
+    }).length;
+
+    const progressPercent = totalUnits > 0 ? (completedCount / totalUnits) * 100 : 0;
+    const isComplete = totalUnits > 0 && completedCount === totalUnits;
+
+    // Default unlocked for now
     const isLocked = false;
-    const progress: number = 0; // Placeholder
 
     return (
         <motion.div
@@ -142,13 +155,23 @@ function StageCard({ stage, rankId, index }: { stage: any; rankId: string; index
 
                     <h3 className="text-2xl font-bold mb-2 drop-shadow-sm leading-tight">{stage.title}</h3>
 
-                    <span className="text-white/90 font-medium bg-black/10 px-3 py-1 rounded-full text-sm">
-                        {stage.units.length} Units
-                    </span>
+                    <div className="flex flex-col items-center gap-1 mt-1">
+                        <span className="text-white/90 font-medium bg-black/10 px-3 py-1 rounded-full text-sm">
+                            {completedCount} / {totalUnits} Units
+                        </span>
 
-                    {/* Completion Star (Placeholder for future) */}
-                    {progress === 100 && (
-                        <div className="absolute -top-3 -right-3 bg-yellow-300 text-yellow-800 p-2 rounded-full shadow-lg border-4 border-white transform rotate-12">
+                        {/* Mini Progress Bar */}
+                        <div className="w-24 h-1.5 bg-black/20 rounded-full overflow-hidden mt-1">
+                            <div
+                                className="h-full bg-white/90 rounded-full transition-all duration-500"
+                                style={{ width: `${progressPercent}%` }}
+                            />
+                        </div>
+                    </div>
+
+                    {/* Completion Star */}
+                    {isComplete && (
+                        <div className="absolute -top-3 -right-3 bg-yellow-300 text-yellow-800 p-2 rounded-full shadow-lg border-4 border-white transform rotate-12 animate-bounce-slow">
                             <Star className="w-6 h-6 fill-current" />
                         </div>
                     )}
